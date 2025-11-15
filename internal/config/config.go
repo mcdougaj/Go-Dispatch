@@ -12,6 +12,7 @@ type Config struct {
 	GoogleMaps GoogleMapsConfig
 	Motive     MotiveConfig
 	Server     ServerConfig
+	Database   DatabaseConfig
 }
 
 // GoogleMapsConfig holds Google Maps API configuration
@@ -32,6 +33,11 @@ type ServerConfig struct {
 	Env  string
 }
 
+// DatabaseConfig holds database configuration
+type DatabaseConfig struct {
+	Path string
+}
+
 // Load loads configuration from environment variables
 func Load() (*Config, error) {
 	// Load .env file if it exists
@@ -49,6 +55,9 @@ func Load() (*Config, error) {
 		Server: ServerConfig{
 			Port: getEnvOrDefault("PORT", "8080"),
 			Env:  getEnvOrDefault("NODE_ENV", "development"),
+		},
+		Database: DatabaseConfig{
+			Path: getEnvOrDefault("DATABASE_PATH", "./dispatch.db"),
 		},
 	}
 

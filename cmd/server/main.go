@@ -14,6 +14,7 @@ import (
 	"github.com/mcdougaj/Go-Dispatch/internal/api/googlemaps"
 	"github.com/mcdougaj/Go-Dispatch/internal/api/motive"
 	"github.com/mcdougaj/Go-Dispatch/internal/config"
+	"github.com/mcdougaj/Go-Dispatch/internal/database"
 	"github.com/mcdougaj/Go-Dispatch/internal/handler"
 	"github.com/mcdougaj/Go-Dispatch/internal/service"
 )
@@ -38,8 +39,16 @@ func main() {
 		cfg.Motive.APISecret,
 	)
 
+	// Initialize database
+	db, err := database.New(cfg.Database.Path)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer db.Close()
+	log.Printf("Database initialized at: %s", cfg.Database.Path)
+
 	// Initialize dispatch service
-	dispatchService := service.NewDispatchService(googleMapsClient, motiveClient)
+	dispatchService := service.NewDispatchService(googleMapsClient, motiveClient, db)
 
 	// Initialize HTTP handler
 	httpHandler := handler.NewHandler(dispatchService)
