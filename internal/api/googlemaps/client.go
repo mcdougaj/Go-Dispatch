@@ -89,7 +89,7 @@ func (c *Client) CalculateRoute(ctx context.Context, origin, destination models.
 	var totalDuration int64
 
 	for _, leg := range route.Legs {
-		totalDistance += leg.Distance.Meters
+		totalDistance += int64(leg.Distance.Meters)
 		totalDuration += int64(leg.Duration.Seconds())
 	}
 
@@ -112,10 +112,10 @@ func (c *Client) OptimizeWaypoints(ctx context.Context, origin models.Location, 
 	}
 
 	req := &maps.DirectionsRequest{
-		Origin:           fmt.Sprintf("%f,%f", origin.Latitude, origin.Longitude),
-		Destination:      waypointStrs[len(waypointStrs)-1],
-		Waypoints:        waypointStrs[:len(waypointStrs)-1],
-		OptimizeWaypoints: true,
+		Origin:      fmt.Sprintf("%f,%f", origin.Latitude, origin.Longitude),
+		Destination: waypointStrs[len(waypointStrs)-1],
+		Waypoints:   waypointStrs[:len(waypointStrs)-1],
+		Optimize:    true,
 	}
 
 	routes, _, err := c.client.Directions(ctx, req)
