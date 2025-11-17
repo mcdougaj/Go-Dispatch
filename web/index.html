@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go-Dispatch - Logistics & Fleet Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            color: #667eea;
+            background: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-small {
+            padding: 6px 15px;
+            font-size: 13px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-available {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-in-use {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-planned {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .badge-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .stops-list {
+            margin-top: 20px;
+        }
+
+        .stop-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .stop-item .remove-stop {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .route-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .route-details h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .route-stops {
+            margin-top: 15px;
+        }
+
+        .route-stop {
+            padding: 12px;
+            background: white;
+            border-left: 4px solid #667eea;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .route-stop .stop-number {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚚 Go-Dispatch</h1>
+            <p class="subtitle">Logistics & Fleet Management System</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalDrivers">0</div>
+                <div class="stat-label">Total Drivers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalVehicles">0</div>
+                <div class="stat-label">Total Vehicles</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalRoutes">0</div>
+                <div class="stat-label">Active Routes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="availableVehicles">0</div>
+                <div class="stat-label">Available Vehicles</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+                <button class="tab" onclick="switchTab('drivers')">👤 Drivers</button>
+                <button class="tab" onclick="switchTab('vehicles')">🚗 Vehicles</button>
+                <button class="tab" onclick="switchTab('routes')">🗺️ Routes</button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Dashboard Overview</h2>
+                <div class="alert" id="dashboardAlert"></div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                    <div>
+                        <h3 style="margin-bottom: 15px;">Recent Routes</h3>
+                        <div id="recentRoutes"></div>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 15px;">Fleet Status</h3>
+                        <div id="fleetStatus"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drivers Tab -->
+            <div id="drivers" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Driver Management</h2>
+                <div class="alert" id="driverAlert"></div>
+
+                <form id="driverForm" onsubmit="createDriver(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="driverName">Full Name *</label>
+                            <input type="text" id="driverName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="driverPhone">Phone Number *</label>
+                            <input type="tel" id="driverPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="driverEmail">Email *</label>
+                            <input type="email" id="driverEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="driverLicense">License Number *</label>
+                            <input type="text" id="driverLicense" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">➕ Add Driver</button>
+                </form>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>License</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="driversTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Vehicles Tab -->
+            <div id="vehicles" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Vehicle Management</h2>
+                <div class="alert" id="vehicleAlert"></div>
+
+                <form id="vehicleForm" onsubmit="createVehicle(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="vehicleMake">Make *</label>
+                            <input type="text" id="vehicleMake" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleModel">Model *</label>
+                            <input type="text" id="vehicleModel" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleYear">Year *</label>
+                            <input type="number" id="vehicleYear" min="1900" max="2099" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehicleVIN">VIN *</label>
+                            <input type="text" id="vehicleVIN" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="vehiclePlate">License Plate *</label>
+                            <input type="text" id="vehiclePlate" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">➕ Add Vehicle</button>
+                </form>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Make</th>
+                            <th>Model</th>
+                            <th>Year</th>
+                            <th>VIN</th>
+                            <th>License Plate</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehiclesTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Routes Tab -->
+            <div id="routes" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 20px;">Route Management</h2>
+                <div class="alert" id="routeAlert"></div>
+
+                <form id="routeForm" onsubmit="createRoute(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="routeDriver">Driver *</label>
+                            <select id="routeDriver" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="routeVehicle">Vehicle *</label>
+                            <select id="routeVehicle" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="routeStartTime">Planned Start Time *</label>
+                            <input type="datetime-local" id="routeStartTime" required>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Stops</h3>
+                    <div id="stopsList" class="stops-list"></div>
+
+                    <div class="form-grid" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label for="stopAddress">Address</label>
+                            <input type="text" id="stopAddress">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopLat">Latitude</label>
+                            <input type="number" step="0.000001" id="stopLat">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopLng">Longitude</label>
+                            <input type="number" step="0.000001" id="stopLng">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopType">Type</label>
+                            <select id="stopType">
+                                <option value="pickup">Pickup</option>
+                                <option value="delivery">Delivery</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label for="stopNotes">Notes</label>
+                        <textarea id="stopNotes"></textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" onclick="addStop()">➕ Add Stop</button>
+                        <button type="submit" class="btn btn-primary">🚀 Create Route</button>
+                    </div>
+                </form>
+
+                <h3 style="margin-top: 40px; margin-bottom: 15px;">All Routes</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Driver</th>
+                            <th>Vehicle</th>
+                            <th>Planned Start</th>
+                            <th>Status</th>
+                            <th>Distance</th>
+                            <th>Est. Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="routesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let drivers = [];
+        let vehicles = [];
+        let routes = [];
+        let routeStops = [];
+
+        // API Base URL
+        const API_BASE = '/api';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+            setInterval(loadAllData, 30000); // Refresh every 30 seconds
+        });
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            if (tabName === 'routes') {
+                loadDriversForSelect();
+                loadVehiclesForSelect();
+            }
+        }
+
+        // Load all data
+        async function loadAllData() {
+            await Promise.all([
+                loadDrivers(),
+                loadVehicles(),
+                loadRoutes()
+            ]);
+            updateStats();
+        }
+
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalDrivers').textContent = drivers.length;
+            document.getElementById('totalVehicles').textContent = vehicles.length;
+            document.getElementById('totalRoutes').textContent = routes.filter(r => r.status === 'in_progress').length;
+            document.getElementById('availableVehicles').textContent = vehicles.filter(v => v.status === 'available').length;
+        }
+
+        // Show alert
+        function showAlert(elementId, message, type = 'success') {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        // API calls
+        async function apiCall(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            const response = await fetch(API_BASE + endpoint, options);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        }
+
+        // Drivers
+        async function loadDrivers() {
+            try {
+                drivers = await apiCall('/drivers');
+                displayDrivers();
+            } catch (error) {
+                console.error('Failed to load drivers:', error);
+            }
+        }
+
+        function displayDrivers() {
+            const tbody = document.getElementById('driversTableBody');
+            if (drivers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No drivers found. Add your first driver above.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = drivers.map(driver => `
+                <tr>
+                    <td>${driver.id}</td>
+                    <td>${driver.name}</td>
+                    <td>${driver.phone_number}</td>
+                    <td>${driver.email}</td>
+                    <td>${driver.license_number}</td>
+                    <td><span class="badge badge-${driver.status}">${driver.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        async function createDriver(event) {
+            event.preventDefault();
+
+            const data = {
+                name: document.getElementById('driverName').value,
+                phone_number: document.getElementById('driverPhone').value,
+                email: document.getElementById('driverEmail').value,
+                license_number: document.getElementById('driverLicense').value
+            };
+
+            try {
+                await apiCall('/drivers', 'POST', data);
+                showAlert('driverAlert', 'Driver created successfully!');
+                document.getElementById('driverForm').reset();
+                await loadDrivers();
+            } catch (error) {
+                showAlert('driverAlert', 'Failed to create driver: ' + error.message, 'error');
+            }
+        }
+
+        // Vehicles
+        async function loadVehicles() {
+            try {
+                vehicles = await apiCall('/vehicles');
+                displayVehicles();
+            } catch (error) {
+                console.error('Failed to load vehicles:', error);
+            }
+        }
+
+        function displayVehicles() {
+            const tbody = document.getElementById('vehiclesTableBody');
+            if (vehicles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No vehicles found. Add your first vehicle above.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = vehicles.map(vehicle => `
+                <tr>
+                    <td>${vehicle.id}</td>
+                    <td>${vehicle.make}</td>
+                    <td>${vehicle.model}</td>
+                    <td>${vehicle.year}</td>
+                    <td>${vehicle.vin}</td>
+                    <td>${vehicle.license_plate}</td>
+                    <td><span class="badge badge-${vehicle.status.replace('_', '-')}">${vehicle.status.replace('_', ' ')}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        async function createVehicle(event) {
+            event.preventDefault();
+
+            const data = {
+                make: document.getElementById('vehicleMake').value,
+                model: document.getElementById('vehicleModel').value,
+                year: parseInt(document.getElementById('vehicleYear').value),
+                vin: document.getElementById('vehicleVIN').value,
+                license_plate: document.getElementById('vehiclePlate').value
+            };
+
+            try {
+                await apiCall('/vehicles', 'POST', data);
+                showAlert('vehicleAlert', 'Vehicle created successfully!');
+                document.getElementById('vehicleForm').reset();
+                await loadVehicles();
+            } catch (error) {
+                showAlert('vehicleAlert', 'Failed to create vehicle: ' + error.message, 'error');
+            }
+        }
+
+        // Routes
+        async function loadRoutes() {
+            try {
+                routes = await apiCall('/routes');
+                displayRoutes();
+            } catch (error) {
+                console.error('Failed to load routes:', error);
+            }
+        }
+
+        function displayRoutes() {
+            const tbody = document.getElementById('routesTableBody');
+            if (routes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No routes found. Create your first route above.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = routes.map(route => {
+                const driver = drivers.find(d => d.id === route.driver_id);
+                const vehicle = vehicles.find(v => v.id === route.vehicle_id);
+                return `
+                    <tr>
+                        <td>${route.id}</td>
+                        <td>${driver ? driver.name : 'N/A'}</td>
+                        <td>${vehicle ? `${vehicle.make} ${vehicle.model}` : 'N/A'}</td>
+                        <td>${new Date(route.planned_start_time).toLocaleString()}</td>
+                        <td><span class="badge badge-${route.status.replace('_', '-')}">${route.status.replace('_', ' ')}</span></td>
+                        <td>${route.total_distance.toFixed(2)} km</td>
+                        <td>${route.estimated_time} min</td>
+                        <td>
+                            <button class="btn btn-small btn-primary" onclick="viewRoute(${route.id})">View</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function loadDriversForSelect() {
+            const select = document.getElementById('routeDriver');
+            select.innerHTML = '<option value="">Select Driver</option>' +
+                drivers.filter(d => d.status === 'active').map(d =>
+                    `<option value="${d.id}">${d.name}</option>`
+                ).join('');
+        }
+
+        async function loadVehiclesForSelect() {
+            const select = document.getElementById('routeVehicle');
+            select.innerHTML = '<option value="">Select Vehicle</option>' +
+                vehicles.filter(v => v.status === 'available').map(v =>
+                    `<option value="${v.id}">${v.make} ${v.model} (${v.license_plate})</option>`
+                ).join('');
+        }
+
+        function addStop() {
+            const address = document.getElementById('stopAddress').value;
+            const lat = parseFloat(document.getElementById('stopLat').value);
+            const lng = parseFloat(document.getElementById('stopLng').value);
+            const type = document.getElementById('stopType').value;
+            const notes = document.getElementById('stopNotes').value;
+
+            if (!address || !lat || !lng) {
+                alert('Please fill in all stop fields');
+                return;
+            }
+
+            routeStops.push({ address, latitude: lat, longitude: lng, stop_type: type, notes });
+            displayStops();
+
+            // Clear form
+            document.getElementById('stopAddress').value = '';
+            document.getElementById('stopLat').value = '';
+            document.getElementById('stopLng').value = '';
+            document.getElementById('stopNotes').value = '';
+        }
+
+        function displayStops() {
+            const container = document.getElementById('stopsList');
+            if (routeStops.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No stops added yet. Add stops using the form below.</p>';
+                return;
+            }
+
+            container.innerHTML = routeStops.map((stop, index) => `
+                <div class="stop-item">
+                    <button class="remove-stop" onclick="removeStop(${index})">×</button>
+                    <strong>Stop ${index + 1}:</strong> ${stop.address}<br>
+                    <small>Type: ${stop.stop_type} | Lat: ${stop.latitude}, Lng: ${stop.longitude}</small>
+                    ${stop.notes ? `<br><small>Notes: ${stop.notes}</small>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function removeStop(index) {
+            routeStops.splice(index, 1);
+            displayStops();
+        }
+
+        async function createRoute(event) {
+            event.preventDefault();
+
+            if (routeStops.length === 0) {
+                alert('Please add at least one stop');
+                return;
+            }
+
+            const data = {
+                driver_id: parseInt(document.getElementById('routeDriver').value),
+                vehicle_id: parseInt(document.getElementById('routeVehicle').value),
+                planned_start_time: new Date(document.getElementById('routeStartTime').value).toISOString(),
+                stops: routeStops
+            };
+
+            try {
+                await apiCall('/routes', 'POST', data);
+                showAlert('routeAlert', 'Route created and optimized successfully!');
+                document.getElementById('routeForm').reset();
+                routeStops = [];
+                displayStops();
+                await loadRoutes();
+            } catch (error) {
+                showAlert('routeAlert', 'Failed to create route: ' + error.message, 'error');
+            }
+        }
+
+        async function viewRoute(id) {
+            try {
+                const route = await apiCall(`/routes/${id}`);
+                alert(`Route #${route.id}\n\nDriver: ${route.driver_id}\nVehicle: ${route.vehicle_id}\nStatus: ${route.status}\nDistance: ${route.total_distance.toFixed(2)} km\nEstimated Time: ${route.estimated_time} minutes\nStops: ${route.stops?.length || 0}`);
+            } catch (error) {
+                alert('Failed to load route details');
+            }
+        }
+    </script>
+</body>
+</html>
